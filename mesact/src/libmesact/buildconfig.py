@@ -3,7 +3,7 @@ import os, traceback, configparser
 from libmesact import settings
 
 from libmesact import checkconfig
-from libmesact import updateini
+
 from libmesact import buildini
 from libmesact import buildhal
 from libmesact import buildio
@@ -12,7 +12,6 @@ from libmesact import buildss
 from libmesact import utilities
 
 def build(parent):
-
 	if not checkconfig.checkit(parent):
 		parent.machinePTE.appendPlainText('Build Failed')
 		return
@@ -46,12 +45,11 @@ def build(parent):
 		except OSError:
 			parent.machinePTE.appendPlainText(f'OS error\n {traceback.print_exc()}')
 
-	iniFilePath = os.path.join(parent.configPath, parent.configNameUnderscored + '.ini')
-	if os.path.exists(iniFilePath):
-		updateini = updateini()
-		updateini.update(parent)
+	iniFile = os.path.join(parent.configPath, parent.configNameUnderscored + '.ini')
+	if os.path.exists(iniFile):
+		parent.updateini.update(parent, iniFile)
 
-	print(iniFilePath)
+		#print(iniFilePath)
 
 	'''
 	buildini.build(parent)
