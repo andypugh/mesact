@@ -46,7 +46,12 @@ def build(parent):
 		except OSError:
 			parent.machinePTE.appendPlainText(f'OS error\n {traceback.print_exc()}')
 
-	print(parent.configPath)
+	iniFilePath = os.path.join(parent.configPath, parent.configNameUnderscored + '.ini')
+	if os.path.exists(iniFilePath):
+		updateini = updateini()
+		updateini.update(parent)
+
+	print(iniFilePath)
 
 	'''
 	buildini.build(parent)
