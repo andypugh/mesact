@@ -48,11 +48,13 @@ def build(parent):
 	iniFile = os.path.join(parent.configPath, parent.configNameUnderscored + '.ini')
 	if os.path.exists(iniFile):
 		parent.updateini.update(parent, iniFile)
+	else:
+		buildini.build(parent)
 
 		#print(iniFilePath)
 
 	'''
-	buildini.build(parent)
+	
 	buildhal.build(parent)
 	buildio.build(parent)
 	buildmisc.build(parent)
