@@ -5,11 +5,12 @@ class updateini:
 	def __init__(self):
 		super().__init__()
 		self.sections = {}
-		self.content = []
 		self.iniFile = ''
 
 	def update(self, parent, iniFile):
 		self.iniFile = iniFile
+		with open(self.iniFile,'r') as file:
+			self.content = file.readlines()
 		self.get_sections()
 		#print(self.sections.keys())
 		if self.content[0].startswith('# This file'):
@@ -39,6 +40,8 @@ class updateini:
 			['HM2',  'DRIVER', f'hm2_eth'],
 			['HM2',  'IPADDRESS', f'{parent.ipAddressCB.currentText()}']
 			]
+		else:
+			self.delete_key('HM2', 'IPADDRESS')
 		elif parent.boardType == 'pci':
 			hm2 = ['HM2',  'DRIVER', 'hm2_pci']
 		hm2.append(['HM2',  'STEPGENS', f'{parent.stepgensCB.currentData()}'])
@@ -60,20 +63,37 @@ class updateini:
 		]
 		if parent.editorCB.currentData():
 			display.append(['DISPLAY', 'EDITOR', f'{parent.editorCB.currentData()}'])
+		else:
+			self.delete_key('DISPLAY', 'EDITOR')
 		if set('XYZUVW')&set(parent.coordinatesLB.text()):
-			display.append(['DISPLAY', 'MIN_VELOCITY', f'{parent.minLinJogVelDSB.value()}'])
+			display.append(['DISPLAY', 'MIN_LINEAR_VELOCITY', f'{parent.minLinJogVelDSB.value()}'])
 			display.append(['DISPLAY', 'DEFAULT_LINEAR_VELOCITY', f'{parent.defLinJogVelDSB.value()}'])
 			display.append(['DISPLAY', 'MAX_LINEAR_VELOCITY', f'{parent.maxLinJogVelDSB.value()}'])
+		else:
+			self.delete_key('DISPLAY', 'MIN_LINEAR_VELOCITY')
+			self.delete_key('DISPLAY', 'DEFAULT_LINEAR_VELOCITY')
+			self.delete_key('DISPLAY', 'MAX_LINEAR_VELOCITY')
 		if set('ABC')&set(parent.coordinatesLB.text()):
 			display.append(['DISPLAY', 'MIN_ANGULAR_VELOCITY', f'{parent.minAngJogVelDSB.value()}'])
 			display.append(['DISPLAY', 'DEFAULT_ANGULAR_VELOCITY', f'{parent.defAngJogVelDSB.value()}'])
 			display.append(['DISPLAY', 'MAX_ANGULAR_VELOCITY', f'{parent.maxAngJogVelDSB.value()}'])
+		else:
+			self.delete_key('DISPLAY', 'MIN_ANGULAR_VELOCITY')
+			self.delete_key('DISPLAY', 'DEFAULT_ANGULAR_VELOCITY')
+			self.delete_key('DISPLAY', 'MAX_ANGULAR_VELOCITY')
+
 		if parent.pyvcpCB.isChecked():
 			display.append(['DISPLAY', 'PYVCP', f'{parent.configNameUnderscored}.xml'])
+		else:
+			self.delete_key('DISPLAY', 'PYVCP')
 		if parent.frontToolLatheCB.isChecked():
 			display.append(['DISPLAY', 'LATHE', '1'])
+		else:
+			self.delete_key('DISPLAY', 'LATHE')
 		if parent.frontToolLatheCB.isChecked():
 			display.append(['DISPLAY', 'BACK_TOOL_LATHE', '1'])
+		else:
+			self.delete_key('DISPLAY', 'BACK_TOOL_LATHE')
 		for item in display:
 			self.update_key(item[0], item[1], item[2])
 
@@ -84,6 +104,10 @@ class updateini:
 		display = [
 		['',  '', f'']
 		]
+		
+		gotta figure out how to delete an item from the ini file that is not used
+		by the tool...
+		
 		'''
 
 
@@ -93,8 +117,6 @@ class updateini:
 		parent.machinePTE.appendPlainText(f'{os.path.basename(iniFile)} Updated')
 
 	def get_sections(self):
-		with open(self.iniFile,'r') as file:
-			self.content = file.readlines()
 		for index, line in enumerate(self.content):
 			if line.strip().startswith('['):
 				self.sections[line.strip()] = [index + 1, 0]
@@ -120,5 +142,15 @@ class updateini:
 		if not found:
 			self.content.insert(end, f'{key} = {value}\n')
 			self.get_sections() # update section start/end
+
+	def delete_key(self, section, key):
+		start = self.sections[f'[{section}]'][0]
+		end = self.sections[f'[{section}]'][1]
+		for item in self.content[start:end]:
+			if item.startswith(key):
+				index = self.content.index(item)
+				del self.content[index]
+				self.get_sections() # update section start/end
+
 
 
