@@ -12,7 +12,6 @@ class updateini:
 		with open(self.iniFile,'r') as file:
 			self.content = file.readlines()
 		self.get_sections()
-		#print(self.sections.keys())
 		if self.content[0].startswith('# This file'):
 			self.content[0] = ('# This file was updated with the Mesa Configuration'
 				f'Tool on {datetime.now().strftime("%b %d %Y %H:%M:%S")}\n')
@@ -42,7 +41,7 @@ class updateini:
 			]
 		else:
 			self.delete_key('HM2', 'IPADDRESS')
-		elif parent.boardType == 'pci':
+		if parent.boardType == 'pci':
 			hm2 = ['HM2',  'DRIVER', 'hm2_pci']
 		hm2.append(['HM2',  'STEPGENS', f'{parent.stepgensCB.currentData()}'])
 		hm2.append(['HM2',  'PWMGENS', f'{parent.pwmgensCB.currentData()}'])
@@ -81,7 +80,6 @@ class updateini:
 			self.delete_key('DISPLAY', 'MIN_ANGULAR_VELOCITY')
 			self.delete_key('DISPLAY', 'DEFAULT_ANGULAR_VELOCITY')
 			self.delete_key('DISPLAY', 'MAX_ANGULAR_VELOCITY')
-
 		if parent.pyvcpCB.isChecked():
 			display.append(['DISPLAY', 'PYVCP', f'{parent.configNameUnderscored}.xml'])
 		else:
@@ -97,17 +95,91 @@ class updateini:
 		for item in display:
 			self.update_key(item[0], item[1], item[2])
 
+		if len(set(parent.coordinatesLB.text())) == len(parent.coordinatesLB.text()): # 1 joint for each axis
+			kins = [['KINS', 'KINEMATICS', f'trivkins coordinates={parent.coordinatesLB.text()}']]
+		else: # more than one joint per axis
+			kins = [['KINS', 'KINEMATICS', f'trivkins coordinates={parent.coordinatesLB.text()} kinstype=BOTH']]
+		kins.append(['KINS', 'JOINTS', f'{len(parent.coordinatesLB.text())}'])
+		for item in kins:
+			self.update_key(item[0], item[1], item[2])
 
+		emcio = [
+		['EMCIO', 'EMCIO', 'iov2'],
+		['EMCIO', 'CYCLE_TIME', '0.100'],
+		['EMCIO', 'TOOL_TABLE', 'tool.tbl']
+		]
+		for item in emcio:
+			self.update_key(item[0], item[1], item[2])
+
+		rs274ngc = [
+		['RS274NGC', 'PARAMETER_FILE', f'{parent.configNameUnderscored}.var'],
+		['RS274NGC', 'SUBROUTINE_PATH', f'{os.path.expanduser("~/linuxcnc/subroutines")}']
+		]
+
+		for item in rs274ngc:
+			self.update_key(item[0], item[1], item[2])
+
+		emcmot = [
+		['EMCMOT', 'EMCMOT', 'motmod'],
+		['EMCMOT', 'COMM_TIMEOUT', '1.0'],
+		['EMCMOT', 'SERVO_PERIOD', f'{parent.servoPeriodSB.value()}']
+		]
+
+		for item in emcmot:
+			self.update_key(item[0], item[1], item[2])
+
+		task = [
+		['TASK', 'TASK', 'milltask'],
+		['TASK', 'CYCLE_TIME', '0.010']
+		]
+
+		for item in task:
+			self.update_key(item[0], item[1], item[2])
+
+		traj = [
+		['TRAJ', 'COORDINATES', f'{parent.coordinatesLB.text()}'],
+		['TRAJ', 'LINEAR_UNITS', f'{parent.linearUnitsCB.currentData()}'],
+		['TRAJ', 'ANGULAR_UNITS', 'degree'],
+		['TRAJ', 'MAX_LINEAR_VELOCITY', f'{parent.trajMaxLinVelDSB.value()}'],
+		]
+		if parent.noforcehomingCB.isChecked():
+			traj.append('TRAJ','NO_FORCE_HOMING', '0')
+		else:
+			traj.append('TRAJ','NO_FORCE_HOMING', '1')
+
+		for item in traj:
+			self.update_key(item[0], item[1], item[2])
+
+		hal = [
+		['HAL', 'HALFILE', f'filelist.hal'],
+		]
+		if parent.postguiCB.isChecked():
+			hal.append('HAL', 'POSTGUI_HALFILE', 'postgui.hal')
+		if parent.shutdownCB.isChecked():
+			hal.append('HAL', 'SHUTDOWN', 'shutdown.hal')
+		if parent.postguiCB.isChecked():
+			hal.append('HAL', 'POSTGUI_HALFILE', 'postgui.hal')
+		if parent.shutdownCB.isChecked():
+			hal.append('HAL', 'SHUTDOWN', 'shutdown.hal')
+
+		hal.append('HAL', 'HALUI', 'halui')
+
+		for item in hal:
+			self.update_key(item[0], item[1], item[2])
 
 
 		'''
 		display = [
-		['',  '', f'']
+		['HAL', 'HALFILE', f''],
 		]
-		
-		gotta figure out how to delete an item from the ini file that is not used
-		by the tool...
-		
+
+		for item in traj:
+			self.update_key(item[0], item[1], item[2])
+
+		iniContents.append('HALUI = halui\n')
+
+		# build the [HALUI] section
+		iniContents.append('\n[HALUI]\n')
 		'''
 
 
@@ -131,12 +203,10 @@ class updateini:
 	def update_key(self, section, key, value):
 		start = self.sections[f'[{section}]'][0]
 		end = self.sections[f'[{section}]'][1]
-		#print(f'Start: {start} End: {end}')
 		found = False
 		for item in self.content[start:end]:
 			if item.startswith(key):
 				index = self.content.index(item)
-				#print(item)
 				self.content[index] = f'{key} = {value}\n'
 				found = True
 		if not found:

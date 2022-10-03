@@ -51,6 +51,19 @@ def build(parent):
 	else:
 		buildini.build(parent)
 
+	# build halfiles.hal
+	halfiles = []
+	halfiles.append(f'source {os.path.join(parent.configNameUnderscored + ".hal")}')
+	halfiles.append('source io.hal')
+	if parent.customhalCB.isChecked():
+		halfiles.append('source custom.hal')
+	if parent.ssCardCB.currentData():
+		halfiles.append('source sserial.hal')
+
+	with open(os.path.join(parent.configPath, 'filelist' + '.hal'), 'w') as f:
+		f.write('\n'.join(halfiles))
+
+
 		#print(iniFilePath)
 
 	'''
