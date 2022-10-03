@@ -143,9 +143,9 @@ class updateini:
 		['TRAJ', 'MAX_LINEAR_VELOCITY', f'{parent.trajMaxLinVelDSB.value()}'],
 		]
 		if parent.noforcehomingCB.isChecked():
-			traj.append('TRAJ','NO_FORCE_HOMING', '0')
+			traj.append(['TRAJ','NO_FORCE_HOMING', '0'])
 		else:
-			traj.append('TRAJ','NO_FORCE_HOMING', '1')
+			traj.append(['TRAJ','NO_FORCE_HOMING', '1'])
 
 		for item in traj:
 			self.update_key(item[0], item[1], item[2])
@@ -162,15 +162,53 @@ class updateini:
 		if parent.shutdownCB.isChecked():
 			hal.append('HAL', 'SHUTDOWN', 'shutdown.hal')
 
-		hal.append('HAL', 'HALUI', 'halui')
+		hal.append(['HAL', 'HALUI', 'halui'])
 
 		for item in hal:
 			self.update_key(item[0], item[1], item[2])
 
+		# To Do build joints for each axis after the axis so the ini is easier to read
+		if parent.cardTabs.isTabEnabled(0):
+			card = 'c0'
+		elif parent.cardTabs.isTabEnabled(1):
+			card = 'c1'
+		axes = []
+		for i in range(6):
+			if getattr(parent, f'{card}_axisCB_{i}').currentData():
+				axes.append([getattr(parent, f'{card}_axisCB_{i}').currentData(), i])
+
 
 		'''
+		# build the axes
+		axes = []
+		axis_n = []
+		for i in range(6):
+			axis = getattr(parent, f'{card}_axisCB_{i}').currentData()
+			if axis and axis not in axes:
+				axes.append(axis)
+
+		axis_n = [
+		['', '', f''],
+		]
+
+		for item in axis_:
+			self.update_key(item[0], item[1], item[2])
+
+
+
+
+				#jointTab = getattr(parent, f'{card}_axisCB_{i}')
+				iniContents.append(f'\n[AXIS_{axis}]\n')
+				#print(getattr(parent, f'{card}_minLimit_{i}').text())
+
+				iniContents.append(f'MIN_LIMIT = {getattr(parent, f"{card}_minLimit_{i}").text()}\n')
+				iniContents.append(f'MAX_LIMIT = {getattr(parent, f"{card}_maxLimit_{i}").text()}\n')
+				iniContents.append(f'MAX_VELOCITY = {getattr(parent, f"{card}_maxVelocity_{i}").text()}\n')
+				iniContents.append(f'MAX_ACCELERATION = {getattr(parent, f"{card}_maxAccel_{i}").text()}\n')
+
+
 		display = [
-		['HAL', 'HALFILE', f''],
+		['', '', f''],
 		]
 
 		for item in traj:
