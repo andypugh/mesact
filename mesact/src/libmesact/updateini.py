@@ -157,28 +157,51 @@ class updateini:
 			hal.append('HAL', 'POSTGUI_HALFILE', 'postgui.hal')
 		if parent.shutdownCB.isChecked():
 			hal.append('HAL', 'SHUTDOWN', 'shutdown.hal')
-		if parent.postguiCB.isChecked():
-			hal.append('HAL', 'POSTGUI_HALFILE', 'postgui.hal')
-		if parent.shutdownCB.isChecked():
-			hal.append('HAL', 'SHUTDOWN', 'shutdown.hal')
 
 		hal.append(['HAL', 'HALUI', 'halui'])
 
 		for item in hal:
 			self.update_key(item[0], item[1], item[2])
 
-		# To Do build joints for each axis after the axis so the ini is easier to read
+		# [AXIS_]
+
 		if parent.cardTabs.isTabEnabled(0):
 			card = 'c0'
 		elif parent.cardTabs.isTabEnabled(1):
 			card = 'c1'
+
+		# see if all axis sections exist
+		axes = ['X', 'Y', 'Z', 'A', 'B', 'C', 'U', 'V', 'W']
+		for i in range(6):
+			if getattr(parent, f'{card}_axisCB_{i}').currentData():
+				axis_letter = f'{getattr(parent, f"{card}_axisCB_{i}").currentData()}'
+				axis_section = f'[AXIS_{axis_letter}]'
+				if axis_section in self.sections.keys():
+					if axis_letter in axes:
+						axes.remove(axis_letter)
+					print(f'Section: {axis_section} [JOINT_{i}] exists')
+				else:
+					print(f'Section: {axis_section} missing')
+
+		for axis in axes:
+			if f'[AXIS_{axis}]' in self.sections.keys():
+				print(f'[AXIS_{axis}] needs to be removed')
+			else:
+				print(f'[AXIS_{axis}] not in ini file')
+
+
+		#print(axes)
+
+		'''
 		axes = []
 		for i in range(6):
 			if getattr(parent, f'{card}_axisCB_{i}').currentData():
 				axes.append([getattr(parent, f'{card}_axisCB_{i}').currentData(), i])
 
+		#print(axes)
+		#print(set(parent.coordinatesLB.text()))
 
-		'''
+
 		# build the axes
 		axes = []
 		axis_n = []
@@ -237,6 +260,7 @@ class updateini:
 			if previous:
 				self.sections[previous][1] = value[0] - 2
 			previous = key
+		#print(self.sections)
 
 	def update_key(self, section, key, value):
 		start = self.sections[f'[{section}]'][0]
