@@ -170,6 +170,39 @@ class updateini:
 		elif parent.cardTabs.isTabEnabled(1):
 			card = 'c1'
 
+		axis_list = []
+		for i in range(6):
+			if getattr(parent, f'{card}_axisCB_{i}').currentData():
+				axis_letter = f'{getattr(parent, f"{card}_axisCB_{i}").currentData()}'
+				axis_section = f'[AXIS_{axis_letter}]'
+				if f'[AXIS_{axis_letter}]' not in axis_list:
+					axis_list.append(axis_section)
+		print(len(axis_list))
+		print(axis_list)
+
+		axis_keys = []
+		for key in self.sections.keys():
+			if key.startswith('[AXIS_'):
+				axis_keys.append(key)
+		print(len(axis_keys))
+		print(axis_keys)
+
+		for i in range(len(axis_keys)):
+			if axis_list[i] != axis_keys[i]:
+				print(f'Replace {axis_keys[i]} with {axis_list[i]}')
+				index = self.content.index(f'{axis_keys[i]}\n')
+				if index:
+					self.content[index] = f'{axis_list[i]}\n'
+
+
+		'''
+		#print(axis_list)
+		for axis in axis_list:
+			if axis in self.sections.keys():
+				print(axis)
+			else:
+				print(f'Missing {axis}')
+
 		# see if all axis sections exist
 		axes = ['X', 'Y', 'Z', 'A', 'B', 'C', 'U', 'V', 'W']
 		for i in range(6):
@@ -182,6 +215,7 @@ class updateini:
 					print(f'Section: {axis_section} [JOINT_{i}] exists')
 				else:
 					print(f'Section: {axis_section} missing')
+					self.add_section(axis_section)
 
 		for axis in axes:
 			if f'[AXIS_{axis}]' in self.sections.keys():
@@ -193,7 +227,7 @@ class updateini:
 
 		#print(axes)
 
-		'''
+
 		axes = []
 		for i in range(6):
 			if getattr(parent, f'{card}_axisCB_{i}').currentData():
@@ -244,11 +278,11 @@ class updateini:
 		iniContents.append('\n[HALUI]\n')
 		'''
 		# TESTING
-		iniFile = '/home/john/linuxcnc/configs/7i96s/test.ini'
+		self.iniFile = '/home/john/linuxcnc/configs/7i96s/test.ini'
 		with open(self.iniFile, 'w') as outfile:
 			outfile.write(''.join(self.content))
 
-		parent.machinePTE.appendPlainText(f'{os.path.basename(iniFile)} Updated')
+		parent.machinePTE.appendPlainText(f'{os.path.basename(self.iniFile)} Updated')
 
 	def get_sections(self):
 		for index, line in enumerate(self.content):
@@ -259,7 +293,7 @@ class updateini:
 		previous = ''
 		for key, value in self.sections.items():
 			if previous:
-				self.sections[previous][1] = value[0] - 2
+				self.sections[previous][1] = value[0] - 1
 			previous = key
 		#print(self.sections)
 
@@ -285,12 +319,23 @@ class updateini:
 				del self.content[index]
 				self.get_sections() # update section start/end
 
-	def add_section(self):
-		pass
+	def replace_section(self, section):
+		print(section)
+
+	def add_section(self, section):
+		axis = section[-2]
+		print(f'Adding {axis} section')
+		for i in range(6):
+			if section in self.sections.keys():
+				pass
+			#if getattr(parent, f'{card}_axisCB_{i}').currentData() == axis:
+
 
 	def remove_section(self, section):
-		print(f'Removing {section}')
-		print(self.sections[section])
+		start = self.sections[section][0]
+		end = self.sections[section][1]
+		del self.content[start:end]
+
 
 
 
