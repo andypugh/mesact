@@ -186,8 +186,9 @@ class updateini:
 		for axis in axes:
 			if f'[AXIS_{axis}]' in self.sections.keys():
 				print(f'[AXIS_{axis}] needs to be removed')
-			else:
-				print(f'[AXIS_{axis}] not in ini file')
+				self.remove_section(f'[AXIS_{axis}]')
+			#else:
+			#	print(f'[AXIS_{axis}] not in ini file')
 
 
 		#print(axes)
@@ -242,8 +243,8 @@ class updateini:
 		# build the [HALUI] section
 		iniContents.append('\n[HALUI]\n')
 		'''
-
-
+		# TESTING
+		iniFile = '/home/john/linuxcnc/configs/7i96s/test.ini'
 		with open(self.iniFile, 'w') as outfile:
 			outfile.write(''.join(self.content))
 
@@ -252,7 +253,7 @@ class updateini:
 	def get_sections(self):
 		for index, line in enumerate(self.content):
 			if line.strip().startswith('['):
-				self.sections[line.strip()] = [index + 1, 0]
+				self.sections[line.strip()] = [index, 0]
 
 		# set start and stop index for each section
 		previous = ''
@@ -283,6 +284,14 @@ class updateini:
 				index = self.content.index(item)
 				del self.content[index]
 				self.get_sections() # update section start/end
+
+	def add_section(self):
+		pass
+
+	def remove_section(self, section):
+		print(f'Removing {section}')
+		print(self.sections[section])
+
 
 
 
