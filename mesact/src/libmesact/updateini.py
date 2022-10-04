@@ -170,6 +170,7 @@ class updateini:
 		elif parent.cardTabs.isTabEnabled(1):
 			card = 'c1'
 
+		# check for axis letter changed
 		axis_list = []
 		for i in range(6):
 			if getattr(parent, f'{card}_axisCB_{i}').currentData():
@@ -193,6 +194,7 @@ class updateini:
 				index = self.content.index(f'{axis_keys[i]}\n')
 				if index:
 					self.content[index] = f'{axis_list[i]}\n'
+					self.get_sections()
 
 
 		'''
