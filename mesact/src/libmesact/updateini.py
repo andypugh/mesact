@@ -178,17 +178,17 @@ class updateini:
 				axis_section = f'[AXIS_{axis_letter}]'
 				if f'[AXIS_{axis_letter}]' not in axis_list:
 					axis_list.append(axis_section)
-		print(len(axis_list))
-		print(axis_list)
+		#print(len(axis_list))
+		#print(axis_list)
 
 		axis_keys = []
 		for key in self.sections.keys():
 			if key.startswith('[AXIS_'):
 				axis_keys.append(key)
-		print(len(axis_keys))
-		print(axis_keys)
+		#print(len(axis_keys))
+		#print(axis_keys)
 
-		for i in range(len(axis_keys)):
+		for i in range(len(axis_list)):
 			if axis_list[i] != axis_keys[i]:
 				print(f'Replace {axis_keys[i]} with {axis_list[i]}')
 				index = self.content.index(f'{axis_keys[i]}\n')
@@ -196,8 +196,52 @@ class updateini:
 					self.content[index] = f'{axis_list[i]}\n'
 					self.get_sections()
 
+		# check for joint removed
+		current_joint_list = []
+		for i in range(6):
+			if getattr(parent, f'{card}_axisCB_{i}').currentData():
+				current_joint_list.append(f'[JOINT_{i}]')
+
+		last_joint_list = []
+		for key in self.sections.keys():
+			if key.startswith('[JOINT'):
+				last_joint_list.append(key)
+
+		if current_joint_list != last_joint_list:
+			config_joints = []
+			# get list of joints in config
+			for key in self.sections.keys():
+				if key.startswith('[JOINT'):
+					config_joints.append(key)
+			# remove joints not configured
+			for i in range(len(config_joints)):
+				if not getattr(parent, f"{card}_axisCB_{i}").currentData():
+					print(f'Remove {config_joints[i]}')
+					self.remove_section(config_joints[i])
+
+		# check for axis removed
+		last_axis_list = []
+		for key in self.sections.keys():
+			if key.startswith('[AXIS'):
+				last_axis_list.append(key)
+		#print(f'last {last_axis_list}')
+		current_axis_list = []
+		for i in range(6):
+			axis = getattr(parent, f"{card}_axisCB_{i}").currentData()
+			if axis:
+				current_axis_list.append(f'[AXIS_{axis}]')
+		#print(f'current {current_axis_list}')
+		for axis in last_axis_list:
+			if axis not in current_axis_list:
+				print(f'Remove {axis}')
+				self.remove_section(axis)
 
 		'''
+
+		for i, j in enumerate(joint_list):
+			if i == j:
+				print(f'Joint: {i}')
+
 		#print(axis_list)
 		for axis in axis_list:
 			if axis in self.sections.keys():
