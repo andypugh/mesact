@@ -240,22 +240,47 @@ class updateini:
 		if parent.spindleTypeCB.currentData():
 			pass
 
-		# update the inputs
+		# update the inputs section
 		for i in range(32):
 			self.update_key('INPUTS', f'INPUT_{i}', getattr(parent, "inputPB_" + str(i)).text())
 			self.update_key('INPUTS', f'INPUT_INVERT_{i}', getattr(parent, "inputInvertCB_" + str(i)).isChecked())
 			self.update_key('INPUTS', f'INPUT_SLOW_{i}', getattr(parent, "inputDebounceCB_" + str(i)).isChecked())
 
-		# update the outputs
+		# update the outputs section
 		for i in range(16):
 			self.update_key('OUTPUTS', f'OUTPUT_{i}', getattr(parent, "outputPB_" + str(i)).text())
 			self.update_key('OUTPUTS', f'OUTPUT_INVERT_{i}', getattr(parent, "outputInvertCB_" + str(i)).isChecked())
+
+		# update the options section
+		options = [
+		['OPTIONS', 'LOAD_CONFIG', f'{parent.loadConfigCB.isChecked()}'],
+		['OPTIONS', 'INTRO_GRAPHIC', f'{parent.introGraphicLE.text()}'],
+		['OPTIONS', 'INTRO_GRAPHIC_TIME', f'{parent.splashScreenSB.value()}'],
+		['OPTIONS', 'MANUAL_TOOL_CHANGE', f'{parent.manualToolChangeCB.isChecked()}'],
+		['OPTIONS', 'CUSTOM_HAL', f'{parent.customhalCB.isChecked()}'],
+		['OPTIONS', 'POST_GUI_HAL', f'{parent.postguiCB.isChecked()}'],
+		['OPTIONS', 'SHUTDOWN_HAL', f'{parent.shutdownCB.isChecked()}'],
+		['OPTIONS', 'HALUI', f'{parent.haluiCB.isChecked()}'],
+		['OPTIONS', 'PYVCP', f'{parent.pyvcpCB.isChecked()}'],
+		['OPTIONS', 'GLADEVCP', f'{parent.gladevcpCB.isChecked()}'],
+		['OPTIONS', 'LADDER', f'{parent.ladderGB.isChecked()}'],
+		['OPTIONS', 'BACKUP', f'{parent.backupCB.isChecked()}']
+		]
+		for item in options:
+			self.update_key(item[0], item[1], item[2])
+
+		# update ladder options
+		if parent.ladderGB.isChecked(): # check for any options
+			for option in parent.ladderOptionsList:
+				if getattr(parent, option).value() > 0: #******** work to be done here
+					self.update_key('OPTIONS', f'{getattr(parent, option).property("item")}', f'{getattr(parent, option).value()}')
+
+
 
 		'''
 
 		task = [
 		['TASK', 'TASK', 'milltask'],
-		['TASK', 'CYCLE_TIME', '0.010']
 		]
 
 		self.update_key(section, key, value)
