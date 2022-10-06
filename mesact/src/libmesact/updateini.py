@@ -236,92 +236,33 @@ class updateini:
 				print(f'Remove {axis}')
 				self.remove_section(axis)
 
+		# update the [SPINDLE_0] section
+		if parent.spindleTypeCB.currentData():
+			pass
+
+		# update the inputs
+		for i in range(32):
+			self.update_key('INPUTS', f'INPUT_{i}', getattr(parent, "inputPB_" + str(i)).text())
+			self.update_key('INPUTS', f'INPUT_INVERT_{i}', getattr(parent, "inputInvertCB_" + str(i)).isChecked())
+			self.update_key('INPUTS', f'INPUT_SLOW_{i}', getattr(parent, "inputDebounceCB_" + str(i)).isChecked())
+
+		# update the outputs
+		for i in range(16):
+			self.update_key('OUTPUTS', f'OUTPUT_{i}', getattr(parent, "outputPB_" + str(i)).text())
+			self.update_key('OUTPUTS', f'OUTPUT_INVERT_{i}', getattr(parent, "outputInvertCB_" + str(i)).isChecked())
+
 		'''
 
-		for i, j in enumerate(joint_list):
-			if i == j:
-				print(f'Joint: {i}')
-
-		#print(axis_list)
-		for axis in axis_list:
-			if axis in self.sections.keys():
-				print(axis)
-			else:
-				print(f'Missing {axis}')
-
-		# see if all axis sections exist
-		axes = ['X', 'Y', 'Z', 'A', 'B', 'C', 'U', 'V', 'W']
-		for i in range(6):
-			if getattr(parent, f'{card}_axisCB_{i}').currentData():
-				axis_letter = f'{getattr(parent, f"{card}_axisCB_{i}").currentData()}'
-				axis_section = f'[AXIS_{axis_letter}]'
-				if axis_section in self.sections.keys():
-					if axis_letter in axes:
-						axes.remove(axis_letter)
-					print(f'Section: {axis_section} [JOINT_{i}] exists')
-				else:
-					print(f'Section: {axis_section} missing')
-					self.add_section(axis_section)
-
-		for axis in axes:
-			if f'[AXIS_{axis}]' in self.sections.keys():
-				print(f'[AXIS_{axis}] needs to be removed')
-				self.remove_section(f'[AXIS_{axis}]')
-			#else:
-			#	print(f'[AXIS_{axis}] not in ini file')
-
-
-		#print(axes)
-
-
-		axes = []
-		for i in range(6):
-			if getattr(parent, f'{card}_axisCB_{i}').currentData():
-				axes.append([getattr(parent, f'{card}_axisCB_{i}').currentData(), i])
-
-		#print(axes)
-		#print(set(parent.coordinatesLB.text()))
-
-
-		# build the axes
-		axes = []
-		axis_n = []
-		for i in range(6):
-			axis = getattr(parent, f'{card}_axisCB_{i}').currentData()
-			if axis and axis not in axes:
-				axes.append(axis)
-
-		axis_n = [
-		['', '', f''],
+		task = [
+		['TASK', 'TASK', 'milltask'],
+		['TASK', 'CYCLE_TIME', '0.010']
 		]
 
-		for item in axis_:
+		self.update_key(section, key, value)
+
+		for item in task:
 			self.update_key(item[0], item[1], item[2])
 
-
-
-
-				#jointTab = getattr(parent, f'{card}_axisCB_{i}')
-				iniContents.append(f'\n[AXIS_{axis}]\n')
-				#print(getattr(parent, f'{card}_minLimit_{i}').text())
-
-				iniContents.append(f'MIN_LIMIT = {getattr(parent, f"{card}_minLimit_{i}").text()}\n')
-				iniContents.append(f'MAX_LIMIT = {getattr(parent, f"{card}_maxLimit_{i}").text()}\n')
-				iniContents.append(f'MAX_VELOCITY = {getattr(parent, f"{card}_maxVelocity_{i}").text()}\n')
-				iniContents.append(f'MAX_ACCELERATION = {getattr(parent, f"{card}_maxAccel_{i}").text()}\n')
-
-
-		display = [
-		['', '', f''],
-		]
-
-		for item in traj:
-			self.update_key(item[0], item[1], item[2])
-
-		iniContents.append('HALUI = halui\n')
-
-		# build the [HALUI] section
-		iniContents.append('\n[HALUI]\n')
 		'''
 		# TESTING
 		self.iniFile = '/home/john/linuxcnc/configs/7i96s/test.ini'
