@@ -138,8 +138,8 @@ def build(parent):
 		card = 'c0'
 	elif parent.cardTabs.isTabEnabled(1):
 		card = 'c1'
-	axes = []
 
+	axes = []
 	for i in range(6):
 		axis = getattr(parent, f'{card}_axisCB_{i}').currentData()
 		if axis and axis not in axes:
