@@ -272,8 +272,8 @@ class updateini:
 		# update ladder options
 		if parent.ladderGB.isChecked(): # check for any options
 			for option in parent.ladderOptionsList:
-				if getattr(parent, option).value() > 0: #******** work to be done here
-					self.update_key('OPTIONS', f'{getattr(parent, option).property("item")}', f'{getattr(parent, option).value()}')
+				#print('PLC', f'{getattr(parent, option).property("item")}', f'{getattr(parent, option).value()}')
+				self.update_key('PLC', f'{getattr(parent, option).property("item")}', f'{getattr(parent, option).value()}')
 
 
 
@@ -297,9 +297,10 @@ class updateini:
 		parent.machinePTE.appendPlainText(f'{os.path.basename(self.iniFile)} Updated')
 
 	def get_sections(self):
+		end = len(self.content)
 		for index, line in enumerate(self.content):
 			if line.strip().startswith('['):
-				self.sections[line.strip()] = [index, 0]
+				self.sections[line.strip()] = [index, end]
 
 		# set start and stop index for each section
 		previous = ''
@@ -312,6 +313,9 @@ class updateini:
 	def update_key(self, section, key, value):
 		start = self.sections[f'[{section}]'][0]
 		end = self.sections[f'[{section}]'][1]
+		#if section == 'PLC':
+		#	print(start, end)
+		#	print(section, key, value)
 		found = False
 		for item in self.content[start:end]:
 			if item.startswith(key):
