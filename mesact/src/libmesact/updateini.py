@@ -236,6 +236,17 @@ class updateini:
 				print(f'Remove {axis}')
 				self.remove_section(axis)
 
+		# finally update the [AXIS_n] sections
+		axes = []
+		for i in range(6):
+			axis = getattr(parent, f'{card}_axisCB_{i}').currentData()
+			if axis and axis not in axes:
+				axes.append(axis)
+				self.update_key(f'AXIS_{axis}', f'MIN_LIMIT', getattr(parent, f'{card}_minLimit_{i}').text())
+				self.update_key(f'AXIS_{axis}', f'MAX_LIMIT', getattr(parent, f'{card}_maxLimit_{i}').text())
+				self.update_key(f'AXIS_{axis}', f'MAX_VELOCITY', getattr(parent, f'{card}_maxVelocity_{i}').text())
+				self.update_key(f'AXIS_{axis}', f'MAX_ACCELERATION', getattr(parent, f'{card}_maxAccel_{i}').text())
+
 		# update the [SPINDLE_0] section
 		if parent.spindleTypeCB.currentData():
 			pass
