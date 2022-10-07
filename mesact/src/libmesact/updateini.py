@@ -236,16 +236,83 @@ class updateini:
 				print(f'Remove {axis}')
 				self.remove_section(axis)
 
-		# finally update the [AXIS_n] sections
+		# finally update the [AXIS_n] and [JOINT_n] sections
 		axes = []
 		for i in range(6):
 			axis = getattr(parent, f'{card}_axisCB_{i}').currentData()
 			if axis and axis not in axes:
 				axes.append(axis)
-				self.update_key(f'AXIS_{axis}', f'MIN_LIMIT', getattr(parent, f'{card}_minLimit_{i}').text())
-				self.update_key(f'AXIS_{axis}', f'MAX_LIMIT', getattr(parent, f'{card}_maxLimit_{i}').text())
-				self.update_key(f'AXIS_{axis}', f'MAX_VELOCITY', getattr(parent, f'{card}_maxVelocity_{i}').text())
-				self.update_key(f'AXIS_{axis}', f'MAX_ACCELERATION', getattr(parent, f'{card}_maxAccel_{i}').text())
+				self.update_key(f'AXIS_{axis}', 'MIN_LIMIT', getattr(parent, f'{card}_minLimit_{i}').text())
+				self.update_key(f'AXIS_{axis}', 'MAX_LIMIT', getattr(parent, f'{card}_maxLimit_{i}').text())
+				self.update_key(f'AXIS_{axis}', 'MAX_VELOCITY', getattr(parent, f'{card}_maxVelocity_{i}').text())
+				self.update_key(f'AXIS_{axis}', 'MAX_ACCELERATION', getattr(parent, f'{card}_maxAccel_{i}').text())
+
+			if getattr(parent, f'{card}_axisCB_{i}').currentData():
+				self.update_key(f'JOINT_{i}', 'AXIS', getattr(parent, f'{card}_axisCB_{i}').currentData())
+				self.update_key(f'JOINT_{i}', 'MIN_LIMIT', getattr(parent, f'{card}_minLimit_{i}').text())
+				self.update_key(f'JOINT_{i}', 'MAX_LIMIT', getattr(parent, f'{card}_maxLimit_{i}').text())
+				self.update_key(f'JOINT_{i}', 'MAX_VELOCITY', getattr(parent, f'{card}_maxVelocity_{i}').text())
+				self.update_key(f'JOINT_{i}', 'MAX_ACCELERATION', getattr(parent, f'{card}_maxAccel_{i}').text())
+				self.update_key(f'JOINT_{i}', 'TYPE', getattr(parent, f'{card}_axisType_{i}').text())
+				if getattr(parent, f'{card}_reverse_{i}').isChecked():
+					self.update_key(f'JOINT_{i}', 'SCALE', f'-{getattr(parent, f"{card}_scale_{i}").text()}')
+				else:
+					self.update_key(f'JOINT_{i}', 'SCALE', f'{getattr(parent, f"{card}_scale_{i}").text()}')
+
+				if parent.cardType_0 == 'step' or parent.cardType_1 == 'step': # add step and dir invert
+					self.update_key(f'JOINT_{i}', 'DRIVE', getattr(parent, f'{card}_driveCB_{i}').currentText())
+					self.update_key(f'JOINT_{i}', 'STEP_INVERT', getattr(parent, f'{card}_StepInvert_{i}').isChecked())
+					self.update_key(f'JOINT_{i}', 'DIR_INVERT', getattr(parent, f'{card}_DirInvert_{i}').isChecked())
+					self.update_key(f'JOINT_{i}', 'STEPGEN_MAX_VEL', f'{float(getattr(parent, f"{card}_maxVelocity_{i}").text()) * 1.2:.2f}')
+					self.update_key(f'JOINT_{i}', 'STEPGEN_MAX_ACC', f'{float(getattr(parent, f"{card}_maxAccel_{i}").text()) * 1.2:.2f}')
+					self.update_key(f'JOINT_{i}', 'DIRSETUP', getattr(parent, f'{card}_DirSetup_{i}').text())
+					self.update_key(f'JOINT_{i}', 'DIRHOLD', getattr(parent, f'{card}_DirHold_{i}').text())
+					self.update_key(f'JOINT_{i}', 'STEPLEN', getattr(parent, f'{card}_StepTime_{i}').text())
+					self.update_key(f'JOINT_{i}', 'STEPSPACE', getattr(parent, f'{card}_StepSpace_{i}').text())
+
+				if parent.cardType_0 == 'servo' or parent.cardType_1 == 'servo':
+					self.update_key(f'JOINT_{i}', 'ENCODER_SCALE', getattr(parent, f'{card}_encoderScale_{i}').text())
+					self.update_key(f'JOINT_{i}', 'ANALOG_SCALE_MAX', getattr(parent, f'{card}_analogScaleMax_{i}').text())
+					self.update_key(f'JOINT_{i}', 'ANALOG_MIN_LIMIT', getattr(parent, f'{card}_analogMinLimit_{i}').text())
+					self.update_key(f'JOINT_{i}', 'ANALOG_MAX_LIMIT', getattr(parent, f'{card}_analogMaxLimit_{i}').text())
+
+				self.update_key(f'JOINT_{i}', 'FERROR', getattr(parent, f'{card}_ferror_{i}').text())
+				self.update_key(f'JOINT_{i}', 'MIN_FERROR', getattr(parent, f'{card}_min_ferror_{i}').text())
+				self.update_key(f'JOINT_{i}', 'DEADBAND', getattr(parent, f'{card}_deadband_{i}').text())
+				self.update_key(f'JOINT_{i}', 'P', getattr(parent, f'{card}_p_{i}').text())
+				self.update_key(f'JOINT_{i}', 'I', getattr(parent, f'{card}_i_{i}').text())
+				self.update_key(f'JOINT_{i}', 'D', getattr(parent, f'{card}_d_{i}').text())
+				self.update_key(f'JOINT_{i}', 'FF0', getattr(parent, f'{card}_ff0_{i}').text())
+				self.update_key(f'JOINT_{i}', 'FF1', getattr(parent, f'{card}_ff1_{i}').text())
+				self.update_key(f'JOINT_{i}', 'FF2', getattr(parent, f'{card}_ff2_{i}').text())
+				self.update_key(f'JOINT_{i}', 'BIAS', getattr(parent, f'{card}_bias_{i}').text())
+				self.update_key(f'JOINT_{i}', 'MAX_OUTPUT', getattr(parent, f'{card}_maxOutput_{i}').text())
+				self.update_key(f'JOINT_{i}', 'MAX_ERROR', getattr(parent, f'{card}_maxError_{i}').text())
+				if getattr(parent, f"{card}_home_" + str(i)).text():
+					self.update_key(f'JOINT_{i}', 'HOME', getattr(parent, f"{card}_home_{i}").text())
+				if getattr(parent, f"{card}_homeOffset_{i}").text():
+					self.update_key(f'JOINT_{i}', 'HOME_OFFSET', getattr(parent, f"{card}_homeOffset_{i}").text())
+				if getattr(parent, f"{card}_homeSearchVel_{i}").text():
+					self.update_key(f'JOINT_{i}', 'HOME_SEARCH_VEL', getattr(parent, f"{card}_homeSearchVel_{i}").text())
+				if getattr(parent, f"{card}_homeLatchVel_{i}").text():
+					self.update_key(f'JOINT_{i}', 'HOME_LATCH_VEL', getattr(parent, f"{card}_homeLatchVel_{i}").text())
+				if getattr(parent, f"{card}_homeFinalVelocity_{i}").text():
+					self.update_key(f'JOINT_{i}', 'HOME_FINAL_VEL', getattr(parent, f"{card}_homeFinalVelocity_{i}").text())
+				if getattr(parent, f"{card}_homeSequence_{i}").text():
+					self.update_key(f'JOINT_{i}', 'HOME_SEQUENCE', getattr(parent, f"{card}_homeSequence_{i}").text())
+				if getattr(parent, f"{card}_homeIgnoreLimits_{i}").isChecked():
+					self.update_key(f'JOINT_{i}', 'HOME_IGNORE_LIMITS', True)
+				if getattr(parent, f"{card}_homeUseIndex_{i}").isChecked():
+					self.update_key(f'JOINT_{i}', 'HOME_USE_INDEX', True)
+				if getattr(parent, f"{card}_homeSwitchShared_{i}").isChecked():
+					self.update_key(f'JOINT_{i}', 'HOME_IS_SHARED', True)
+
+
+			'''
+					self.update_key(f'JOINT_{i}', '', )
+
+			'''
+
 
 		# update the [SPINDLE_0] section
 		if parent.spindleTypeCB.currentData():
