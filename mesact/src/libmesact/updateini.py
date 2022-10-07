@@ -307,16 +307,54 @@ class updateini:
 				if getattr(parent, f"{card}_homeSwitchShared_{i}").isChecked():
 					self.update_key(f'JOINT_{i}', 'HOME_IS_SHARED', True)
 
-
-			'''
-					self.update_key(f'JOINT_{i}', '', )
-
-			'''
-
-
 		# update the [SPINDLE_0] section
 		if parent.spindleTypeCB.currentData():
 			pass
+
+		'''
+		if parent.spindleTypeCB.currentData():
+			iniContents.append('\n[SPINDLE]\n')
+			iniContents.append(f'SPINDLE_TYPE = {parent.spindleTypeCB.currentData()}\n')
+			if parent.spindlePwmTypeCB.currentData():
+				iniContents.append(f'SPINDLE_PWM_TYPE = {parent.spindlePwmTypeCB.currentData()}\n')
+			if parent.spindleTypeCB.currentData() == 'analog':
+				iniContents.append(f'PWM_FREQUENCY = {parent.pwmFrequencySB.value()}\n')
+				iniContents.append(f'MAX_RPM = {parent.spindleMaxRpm.value()}\n')
+				iniContents.append(f'MIN_RPM = {parent.spindleMinRpm.value()}\n')
+
+			if parent.spindleFeedbackCB.currentData() == 'encoder':
+				iniContents.append(f'FEEDBACK = {parent.spindleFeedbackCB.currentData()}\n')
+				iniContents.append(f'P = {parent.p_s.value()}\n')
+				iniContents.append(f'I = {parent.i_s.value()}\n')
+				iniContents.append(f'D = {parent.d_s.value()}\n')
+				iniContents.append(f'FF0 = {parent.ff0_s.value()}\n')
+				iniContents.append(f'FF1 = {parent.ff1_s.value()}\n')
+				iniContents.append(f'FF2 = {parent.ff2_s.value()}\n')
+				iniContents.append(f'BIAS = {parent.bias_s.value()}\n')
+				iniContents.append(f'DEADBAND = {parent.deadband_s.value()}\n')
+				iniContents.append(f'MAX_ERROR = {parent.maxError_s.value()}\n')
+				iniContents.append(f'MAX_OUTPUT = {parent.maxOutput_s.value()}\n')
+				iniContents.append(f'OUTPUT_TYPE = {parent.maxOutput_s.value()}\n')
+				iniContents.append(f'ENCODER_SCALE = {parent.spindleEncoderScale.value()}\n')
+
+			if parent.spindleTypeCB.currentData()[:7] == 'stepgen':
+				iniContents.append(f'DRIVE = {parent.spindleDriveCB.currentText()}\n')
+				iniContents.append(f'SCALE = {parent.spindleStepScale.text()}\n')
+				iniContents.append(f'STEPLEN = {parent.spindleStepTime.text()}\n')
+				iniContents.append(f'STEPSPACE = {parent.spindleStepSpace.text()}\n')
+				iniContents.append(f'DIRSETUP = {parent.spindleDirSetup.text()}\n')
+				iniContents.append(f'DIRHOLD = {parent.spindleDirHold.text()}\n')
+				iniContents.append(f'STEP_INVERT = {parent.spindleStepInvert.isChecked()}\n')
+				iniContents.append(f'DIR_INVERT = {parent.spindleDirInvert.isChecked()}\n')
+				iniContents.append(f'MIN_RPM = {parent.spindleMinRpm.value()}\n')
+				iniContents.append(f'MAX_RPM = {parent.spindleMaxRpm.value()}\n')
+				iniContents.append(f'MIN_RPS = {parent.spindleMinRps.text()}\n')
+				iniContents.append(f'MAX_RPS = {parent.spindleMaxRps.text()}\n')
+				iniContents.append(f'MAX_ACCEL_RPM = {parent.spindleMaxAccel.value()}\n')
+				iniContents.append(f'MAX_ACCEL_RPS = {parent.spindleMaxRpss.text()}\n')
+
+		'''
+
 
 		# update the inputs section
 		for i in range(32):
